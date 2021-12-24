@@ -1,8 +1,14 @@
 import numpy as np
 import pickle
 from random import randrange
+import networkx as nx
 
 class Board:
+
+    def get_page_rank(self):
+        G = nx.from_numpy_matrix(self.board_2d)
+        pr = nx.pagerank(G,0.001)
+        return np.fromiter(pr.values(), dtype=float)
 
     def init_player_pos(self,num_players):
 
@@ -20,4 +26,6 @@ class Board:
     def __init__(self, num_players):
         self.board = pickle.load(open("rides.pkl","rb"))
         self.N = self.board.shape[1]
+        self.board_2d = self.board.sum(axis=0) > 0
+        self.pagerank = self.get_page_rank()
         self.init_player_pos(num_players)

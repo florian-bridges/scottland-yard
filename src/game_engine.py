@@ -19,7 +19,7 @@ class Game_Engine:
         return vector
 
     def move_mr_x(self):
-        simple_board = self.board.board.sum(axis=0) > 0
+
         N = self.board.N
         
         mrx_pos = self.to_onehot(N,self.board.player_pos[0]) 
@@ -28,20 +28,20 @@ class Game_Engine:
 
         best_path = np.zeros(N)
         for j in range(N):
-            if not simple_board.dot(mrx_pos)[j]:
+            if not self.board.board_2d.dot(mrx_pos)[j]:
                 continue
             player_state = player_pos
             x_state = self.to_onehot(N,j) 
 
             for i in range(3):
-                possible = np.logical_and(np.logical_not(np.logical_or(np.logical_not(x_state),simple_board.dot(player_state) > 0)),np.logical_not(player_state))
-                player_state = simple_board.dot(player_state) > 0
-                x_state = simple_board.dot(x_state) > 0
+                possible = np.logical_and(np.logical_not(np.logical_or(np.logical_not(x_state),self.board.board_2d.dot(player_state) > 0)),np.logical_not(player_state))
+                player_state = self.board.board_2d.dot(player_state) > 0
+                x_state = self.board.board_2d.dot(x_state) > 0
                 if possible.sum() == 0:
-                    print("mrx can be found in ", i+1,"steps in ", int(j))
+                    print("mrx can be found in ", i+1,"steps in ", int(j + 1))
                     break
             best_path[j] = i
-        best_path =np.multiply(best_path == np.max(best_path),simple_board.dot(simple_board).sum(axis=1))
+        best_path =np.multiply(best_path == np.max(best_path),self.board.pagerank)
         self.board.set_player_pos(0,np.argmax(best_path))
 
     def check_win_cond(self):
